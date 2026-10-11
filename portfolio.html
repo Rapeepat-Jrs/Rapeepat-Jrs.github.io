@@ -84,9 +84,10 @@
     }
     .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; }
     .brand img { width: 32px; height: 32px; border-radius: 50%; background: #1a1d29; }
-    .nav-links { display: flex; gap: 2px; }
+    .nav-links { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+    .nav-links::-webkit-scrollbar { display: none; }
     .nav-links a {
-      text-decoration: none; font-size: .9rem; font-weight: 500;
+      text-decoration: none; font-size: .9rem; font-weight: 500; white-space: nowrap;
       padding: 8px 12px; border-radius: 999px; color: var(--muted);
       transition: background .2s, color .2s;
     }
@@ -214,6 +215,7 @@
 
     @media (max-width: 520px) {
       .brand span { display: none; }
+      .nav-links a { padding: 8px 10px; font-size: .84rem; }
       .hero { padding-top: 52px; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -234,6 +236,7 @@
       </a>
       <div class="nav-links">
         <a href="portfolio.html" class="active">ผลงาน</a>
+        <a href="achievements.html">เกียรติบัตร</a>
         <a href="downloads.html">ดาวน์โหลด</a>
         <a href="index.html">ติดต่อ</a>
       </div>

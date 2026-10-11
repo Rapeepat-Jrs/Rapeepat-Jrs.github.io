@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapeepat Dev · ดาวน์โหลด</title>
+  <meta name="description" content="ไฟล์ดาวน์โหลดจาก Rapeepat Dev">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05060a;
+      --text: #f4f6fb;
+      --muted: rgba(244, 246, 251, 0.62);
+      --faint: rgba(244, 246, 251, 0.38);
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-hover: rgba(255, 255, 255, 0.10);
+      --edge: rgba(255, 255, 255, 0.16);
+      --shine: rgba(255, 255, 255, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", "Noto Sans Thai", system-ui, sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+
+    /* ---------- พื้นหลัง ---------- */
+    #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
+    .blobs { position: fixed; inset: 0; z-index: -1; overflow: hidden; filter: blur(70px); opacity: .85; }
+    .blob { position: absolute; border-radius: 50%; mix-blend-mode: screen; animation: float 22s ease-in-out infinite; }
+    .b1 { width: 460px; height: 460px; background: #3b5bff; top: -120px; left: -100px; }
+    .b2 { width: 380px; height: 380px; background: #b13bff; bottom: -120px; right: -80px; animation-delay: -6s; }
+    .b3 { width: 300px; height: 300px; background: #00d4c8; top: 45%; left: 55%; animation-delay: -12s; opacity: .7; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%      { transform: translate(60px, 40px) scale(1.1); }
+      66%      { transform: translate(-40px, 70px) scale(.92); }
+    }
+    body.webgl .blobs { display: none; }
+    .grain {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .06;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    /* ---------- Liquid glass ---------- */
+    .glass {
+      position: relative;
+      background: var(--glass);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--edge);
+      box-shadow:
+        inset 0 1px 0 var(--shine),
+        inset 0 -1px 0 rgba(255,255,255,.05),
+        inset 0 0 24px rgba(255,255,255,.04),
+        0 20px 50px rgba(0,0,0,.45);
+    }
+    .glass::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(160deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 35%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .wrap { width: 100%; max-width: 820px; margin: 0 auto; padding: 0 16px; }
+
+    /* ---------- แถบเมนู ---------- */
+    .nav {
+      position: sticky; top: 16px; z-index: 10;
+      margin: 16px auto 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 10px 10px 16px;
+      border-radius: 999px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; background: #1a1d29; }
+    .nav-links { display: flex; gap: 2px; }
+    .nav-links a {
+      text-decoration: none; font-size: .9rem; font-weight: 500;
+      padding: 8px 12px; border-radius: 999px; color: var(--muted);
+      transition: background .2s, color .2s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.08); }
+    .nav-links a.active { color: var(--text); background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+
+    /* ---------- หัวเรื่อง ---------- */
+    .hero { padding: 64px 0 28px; text-align: center; animation: rise .8s cubic-bezier(.2,.8,.2,1) both; }
+    .eyebrow {
+      display: inline-block; font-size: .8rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 999px; color: var(--muted); margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15;
+      background: linear-gradient(120deg, #fff 20%, #b9f0ff 55%, #b9c4ff 85%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p { color: var(--muted); max-width: 440px; margin: 12px auto 0; line-height: 1.6; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ---------- ค้นหา + ตัวกรอง ---------- */
+    .search {
+      display: flex; align-items: center; gap: 10px;
+      border-radius: 18px; padding: 0 16px; margin-bottom: 14px;
+    }
+    .search svg { width: 18px; height: 18px; fill: var(--faint); flex: none; }
+    .search input {
+      flex: 1; min-width: 0; background: none; border: 0; outline: 0;
+      color: var(--text); font: inherit; font-size: .95rem; padding: 14px 0;
+    }
+    .search input::placeholder { color: var(--faint); }
+    .search:focus-within { box-shadow: inset 0 1px 0 var(--shine), 0 0 0 2px rgba(140,160,255,.45), 0 20px 50px rgba(0,0,0,.45); }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .chip {
+      font: inherit; font-size: .86rem; font-weight: 500; color: var(--muted);
+      padding: 7px 15px; border-radius: 999px; cursor: pointer;
+      transition: color .2s, background .2s;
+    }
+    .chip:hover { color: var(--text); }
+    .chip.active { color: var(--text); background: rgba(255,255,255,.16); }
+
+    /* ---------- รายการไฟล์ ---------- */
+    .list { display: flex; flex-direction: column; gap: 12px; }
+    .file {
+      display: flex; align-items: center; gap: 16px;
+      border-radius: 22px; padding: 14px;
+      transition: transform .25s cubic-bezier(.2,.8,.2,1), background .25s;
+      animation: rise .6s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .file:hover { background: var(--glass-hover); transform: translateY(-2px); }
+
+    .ficon {
+      flex: none; width: 52px; height: 52px; border-radius: 16px;
+      display: grid; place-items: center;
+      font-size: .7rem; font-weight: 700; letter-spacing: .04em;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    .finfo { flex: 1; min-width: 0; }
+    .finfo h3 { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .finfo p { color: var(--muted); font-size: .86rem; line-height: 1.5; margin-top: 2px; }
+    .fmeta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 6px; font-size: .76rem; color: var(--faint); }
+
+    .factions { display: flex; gap: 8px; flex: none; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      text-decoration: none; font-size: .86rem; font-weight: 500; white-space: nowrap;
+      padding: 10px 14px; border-radius: 14px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      transition: background .2s, transform .2s;
+    }
+    .btn:hover { background: rgba(255,255,255,.16); }
+    .btn:active { transform: scale(.97); }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
+    .btn.primary { background: rgba(80,200,255,.22); border-color: rgba(140,220,255,.4); }
+    .btn.primary:hover { background: rgba(80,200,255,.36); }
+
+    .empty { text-align: center; color: var(--faint); padding: 40px 0; }
+
+    .tip {
+      margin-top: 28px; border-radius: 18px; padding: 14px 18px;
+      font-size: .82rem; color: var(--muted); line-height: 1.6;
+    }
+
+    footer { text-align: center; color: var(--faint); font-size: .78rem; padding: 36px 0 40px; }
+
+    @media (max-width: 560px) {
+      .brand span { display: none; }
+      .file { flex-wrap: wrap; }
+      .factions { width: 100%; }
+      .factions .btn { flex: 1; justify-content: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="blobs" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <nav class="nav glass">
+      <a class="brand" href="index.html">
+        <img src="https://github.com/Rapeepat-Jrs.png" alt="">
+        <span>Rapeepat Dev</span>
+      </a>
+      <div class="nav-links">
+        <a href="portfolio.html">ผลงาน</a>
+        <a href="downloads.html" class="active">ดาวน์โหลด</a>
+        <a href="index.html">ติดต่อ</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <span class="eyebrow glass">Downloads</span>
+      <h1>ดาวน์โหลด</h1>
+      <p>รวมไฟล์ เอกสาร และโปรแกรมต่าง ๆ กดดาวน์โหลดได้เลย</p>
+    </header>
+
+    <label class="search glass">
+      <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.32 12.9l5.39 5.4-1.41 1.41-5.4-5.39A8 8 0 1 1 10 2Zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/></svg>
+      <input id="q" type="search" placeholder="ค้นหาไฟล์…" autocomplete="off">
+    </label>
+    <div class="filters" id="filters"></div>
+
+    <section class="list" id="list"></section>
+
+    <p class="tip glass">💡 ไฟล์ทั้งหมดเก็บอยู่บน Google Drive ถ้าไฟล์ใหญ่ Google จะถามยืนยันก่อนดาวน์โหลด ให้กด "ดาวน์โหลดต่อ" ได้เลย</p>
+
+    <footer>© <span id="y"></span> Rapeepat Dev</footer>
+  </div>
+
+  <script>
+    // =====================================================
+    // 🔧 ใส่ไฟล์ของคุณตรงนี้
+    //   link : วางลิงก์แชร์จาก Google Drive ได้เลย (ต้องตั้งเป็น "ทุกคนที่มีลิงก์")
+    //          รองรับทั้งไฟล์และโฟลเดอร์ เช่น
+    //          https://drive.google.com/file/d/xxxxxxxx/view?usp=sharing
+    //          https://drive.google.com/drive/folders/xxxxxxxx
+    //   type : PDF, ZIP, EXE, APK, DOC, XLS, PPT, IMG, VIDEO, FOLDER ... (ใช้ทำไอคอน)
+    //   size / date : ใส่หรือไม่ใส่ก็ได้
+    // =====================================================
+    const FILES = [
+      {
+        name: "ตัวอย่างเอกสาร.pdf",
+        desc: "คำอธิบายสั้น ๆ ว่าไฟล์นี้คืออะไร",
+        category: "เอกสาร",
+        type: "PDF",
+        size: "2.4 MB",
+        date: "2026-10-11",
+        link: "https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing"
+      },
+      {
+        name: "Source Code โปรเจกต์.zip",
+        desc: "ไฟล์โค้ดทั้งหมดของโปรเจกต์",
+        category: "โปรแกรม",
+        type: "ZIP",
+        size: "18 MB",
+        date: "2026-10-01",
+        link: "https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing"
+      },
+      {
+        name: "รวมรูปภาพ",
+        desc: "โฟลเดอร์รวมไฟล์ภาพทั้งหมด",
+        category: "รูปภาพ",
+        type: "FOLDER",
+        size: "",
+        date: "",
+        link: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID?usp=sharing"
+      }
+    ];
+    // =====================================================
+
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // แปลงลิงก์แชร์ Google Drive → ลิงก์ดาวน์โหลดตรง + ลิงก์เปิดดู
+    function driveLinks(url) {
+      const folder = url.match(/\/folders\/([\w-]+)/);
+      if (folder) return { isFolder: true, view: `https://drive.google.com/drive/folders/${folder[1]}` };
+      const id = (url.match(/\/d\/([\w-]+)/) || url.match(/[?&]id=([\w-]+)/) || [])[1];
+      if (!id) return { view: url, download: url };
+      return {
+        view: `https://drive.google.com/file/d/${id}/view`,
+        download: `https://drive.google.com/uc?export=download&id=${id}`
+      };
+    }
+
+    const typeColors = {
+      PDF: "#ff5f6d", ZIP: "#ffb347", RAR: "#ffb347", EXE: "#7aa2ff", APK: "#3ddc84",
+      DOC: "#4b8bff", XLS: "#2fd16b", PPT: "#ff8a4c", IMG: "#ff5fa2", VIDEO: "#b13bff",
+      AUDIO: "#00d4c8", FOLDER: "#ffd166"
+    };
+
+    const icons = {
+      download: `<svg viewBox="0 0 24 24"><path d="M11 3h2v9.17l3.59-3.58L18 10l-6 6-6-6 1.41-1.41L11 12.17V3ZM4 18h16v2H4v-2Z"/></svg>`,
+      view: `<svg viewBox="0 0 24 24"><path d="M12 5c5 0 9 4.5 10 7-1 2.5-5 7-10 7S3 14.5 2 12c1-2.5 5-7 10-7Zm0 2.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm0 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/></svg>`,
+      folder: `<svg viewBox="0 0 24 24"><path d="M3 5.5A1.5 1.5 0 0 1 4.5 4h5l2 2h8A1.5 1.5 0 0 1 21 7.5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-13Z"/></svg>`
+    };
+
+    const listEl = document.getElementById("list");
+    const filtersEl = document.getElementById("filters");
+    const qEl = document.getElementById("q");
+    let currentCat = "ทั้งหมด";
+
+    const cats = ["ทั้งหมด", ...new Set(FILES.map(f => f.category).filter(Boolean))];
+    filtersEl.innerHTML = cats.map((c, i) =>
+      `<button class="chip glass${i === 0 ? " active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+    filtersEl.addEventListener("click", e => {
+      const b = e.target.closest(".chip");
+      if (!b) return;
+      currentCat = b.dataset.cat;
+      filtersEl.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === b));
+      render();
+    });
+    qEl.addEventListener("input", render);
+
+    function render() {
+      const q = qEl.value.trim().toLowerCase();
+      const list = FILES.filter(f =>
+        (currentCat === "ทั้งหมด" || f.category === currentCat) &&
+        (!q || `${f.name} ${f.desc} ${f.type}`.toLowerCase().includes(q)));
+
+      if (!list.length) { listEl.innerHTML = `<p class="empty">ไม่พบไฟล์ที่ค้นหา</p>`; return; }
+
+      listEl.innerHTML = list.map((f, i) => {
+        const L = driveLinks(f.link);
+        const type = (f.type || (L.isFolder ? "FOLDER" : "FILE")).toUpperCase();
+        const c = typeColors[type] || "#a5b4ff";
+        const date = f.date ? new Date(f.date).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" }) : "";
+        return `
+          <article class="file glass" style="animation-delay:${i * 60}ms">
+            <div class="ficon" style="color:${c};background:${c}22">${type === "FOLDER" ? icons.folder.replace("<svg", `<svg width="24" height="24" fill="${c}"`) : esc(type.slice(0, 4))}</div>
+            <div class="finfo">
+              <h3 title="${esc(f.name)}">${esc(f.name)}</h3>
+              ${f.desc ? `<p>${esc(f.desc)}</p>` : ""}
+              <div class="fmeta">
+                ${f.size ? `<span>${esc(f.size)}</span>` : ""}
+                ${date ? `<span>${date}</span>` : ""}
+                ${f.category ? `<span>${esc(f.category)}</span>` : ""}
+              </div>
+            </div>
+            <div class="factions">
+              ${L.isFolder
+                ? `<a class="btn primary" href="${esc(L.view)}" target="_blank" rel="noopener">${icons.folder}เปิดโฟลเดอร์</a>`
+                : `<a class="btn" href="${esc(L.view)}" target="_blank" rel="noopener">${icons.view}ดู</a>
+                   <a class="btn primary" href="${esc(L.download)}" target="_blank" rel="noopener">${icons.download}ดาวน์โหลด</a>`}
+            </div>
+          </article>`;
+      }).join("");
+    }
+    render();
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // ---------- Three.js: พื้นหลังของเหลวไหล ขยับตามเมาส์ ----------
+    (function () {
+      if (!window.THREE) return;
+      const canvas = document.getElementById("bg");
+      let renderer;
+      try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false }); } catch (e) { return; }
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      const uniforms = {
+        uTime:   { value: 0 },
+        uRes:    { value: new THREE.Vector2() },
+        uMouse:  { value: new THREE.Vector2(0.5, 0.5) },
+        uScroll: { value: 0 }
+      };
+
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }`,
+        fragmentShader: `
+          precision highp float;
+          varying vec2 vUv;
+          uniform float uTime, uScroll;
+          uniform vec2 uRes, uMouse;
+          float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          float noise(vec2 p){
+            vec2 i = floor(p), f = fract(p), u = f*f*(3.0-2.0*f);
+            return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y);
+          }
+          float fbm(vec2 p){ float v=0.0, a=0.5; for(int i=0;i<5;i++){ v+=a*noise(p); p*=2.02; a*=0.5; } return v; }
+          void main(){
+            vec2 asp = vec2(uRes.x/uRes.y, 1.0);
+            vec2 p = (vUv-0.5)*asp*2.2 + vec2(0.0, uScroll*0.6);
+            vec2 m = (uMouse-0.5)*asp*2.2 + vec2(0.0, uScroll*0.6);
+            float t = uTime*0.08;
+            float md = length(p-m);
+            p += (m-p)*0.18*exp(-md*1.5);
+            vec2 q = vec2(fbm(p+t), fbm(p+vec2(5.2,1.3)-t));
+            vec2 r = vec2(fbm(p+3.0*q+vec2(1.7,9.2)+t*1.4), fbm(p+3.0*q+vec2(8.3,2.8)-t*1.2));
+            float f = fbm(p+3.0*r);
+            // โทนฟ้า-เขียวอมฟ้า ให้ต่างจากหน้าอื่นเล็กน้อย
+            vec3 col = mix(vec3(0.10,0.45,1.0), vec3(0.0,0.83,0.78), clamp(f*1.6,0.0,1.0));
+            col = mix(col, vec3(0.45,0.30,1.0), clamp(length(q)*0.9-0.3,0.0,1.0));
+            col = mix(col, vec3(0.70,0.25,1.0), clamp(r.x*r.x*1.4-0.25,0.0,1.0));
+            col *= smoothstep(0.35,0.95,f)*0.85;
+            col += 0.05*exp(-md*2.5)*vec3(0.7,0.9,1.0);
+            col *= smoothstep(1.25,0.25,length(vUv-0.5)*1.6);
+            col += vec3(0.02,0.023,0.04);
+            gl_FragColor = vec4(col, 1.0);
+          }`
+      });
+      scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+      function resize() {
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+        uniforms.uRes.value.set(window.innerWidth, window.innerHeight);
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      const target = new THREE.Vector2(0.5, 0.5);
+      const setPointer = (x, y) => target.set(x / innerWidth, 1 - y / innerHeight);
+      window.addEventListener("pointermove", e => setPointer(e.clientX, e.clientY));
+      window.addEventListener("touchmove", e => { const t = e.touches[0]; if (t) setPointer(t.clientX, t.clientY); }, { passive: true });
+
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const clock = new THREE.Clock();
+      let scroll = 0;
+      (function loop() {
+        uniforms.uTime.value = reduce ? 10 : clock.getElapsedTime();
+        uniforms.uMouse.value.lerp(target, 0.05);
+        scroll += (scrollY / innerHeight - scroll) * 0.08;
+        uniforms.uScroll.value = scroll;
+        renderer.render(scene, camera);
+        if (!reduce) requestAnimationFrame(loop);
+      })();
+      document.body.classList.add("webgl");
+    })();
+  </script>
+</body>
+</html>

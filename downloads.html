@@ -83,9 +83,10 @@
     }
     .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; }
     .brand img { width: 32px; height: 32px; border-radius: 50%; background: #1a1d29; }
-    .nav-links { display: flex; gap: 2px; }
+    .nav-links { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+    .nav-links::-webkit-scrollbar { display: none; }
     .nav-links a {
-      text-decoration: none; font-size: .9rem; font-weight: 500;
+      text-decoration: none; font-size: .9rem; font-weight: 500; white-space: nowrap;
       padding: 8px 12px; border-radius: 999px; color: var(--muted);
       transition: background .2s, color .2s;
     }
@@ -179,6 +180,7 @@
 
     @media (max-width: 560px) {
       .brand span { display: none; }
+      .nav-links a { padding: 8px 10px; font-size: .84rem; }
       .file { flex-wrap: wrap; }
       .factions { width: 100%; }
       .factions .btn { flex: 1; justify-content: center; }
@@ -201,6 +203,7 @@
       </a>
       <div class="nav-links">
         <a href="portfolio.html">ผลงาน</a>
+        <a href="achievements.html">เกียรติบัตร</a>
         <a href="downloads.html" class="active">ดาวน์โหลด</a>
         <a href="index.html">ติดต่อ</a>
       </div>
@@ -232,7 +235,7 @@
     //          รองรับทั้งไฟล์และโฟลเดอร์ เช่น
     //          https://drive.google.com/file/d/xxxxxxxx/view?usp=sharing
     //          https://drive.google.com/drive/folders/xxxxxxxx
-    //   type : PDF, ZIP, EXE, APK, DOC, XLS, PPT, IMG, VIDEO, FOLDER ... (ใช้ทำไอคอน)
+    //   type : PDF, ZIP, EXE, DMG, APK, DOC, XLS, PPT, IMG, VIDEO, FOLDER ... (ใช้ทำไอคอน)
     //   size / date : ใส่หรือไม่ใส่ก็ได้
     // =====================================================
     const FILES = [
@@ -283,7 +286,7 @@
     }
 
     const typeColors = {
-      PDF: "#ff5f6d", ZIP: "#ffb347", RAR: "#ffb347", EXE: "#7aa2ff", APK: "#3ddc84",
+      PDF: "#ff5f6d", ZIP: "#ffb347", RAR: "#ffb347", EXE: "#7aa2ff", DMG: "#c9d1e0", APK: "#3ddc84",
       DOC: "#4b8bff", XLS: "#2fd16b", PPT: "#ff8a4c", IMG: "#ff5fa2", VIDEO: "#b13bff",
       AUDIO: "#00d4c8", FOLDER: "#ffd166"
     };

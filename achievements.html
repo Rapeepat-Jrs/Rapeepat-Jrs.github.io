@@ -159,7 +159,7 @@
       background: linear-gradient(135deg, #ffd16633, #b13bff33);
       display: grid; place-items: center;
     }
-    .cert .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+    .cert .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .5s; }
     .cert:hover .thumb img { transform: scale(1.04); }
     .cert .thumb .ph { font-size: 2.8rem; }
     .badge {
@@ -290,8 +290,9 @@
       *, *::before { animation: none !important; transition: none !important; }
     }
   </style>
+  <script src="lang.js"></script>
 </head>
-<body>
+<body data-title="ac.title">
   <canvas id="bg" aria-hidden="true"></canvas>
   <div class="blobs" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
   <div class="grain" aria-hidden="true"></div>
@@ -303,33 +304,34 @@
         <span>Rapeepat Dev</span>
       </a>
       <div class="nav-links">
-        <a href="portfolio.html">ผลงาน</a>
-        <a href="achievements.html" class="active">เกียรติบัตร</a>
-        <a href="downloads.html">ดาวน์โหลด</a>
-        <a href="index.html">ติดต่อ</a>
+        <a href="portfolio.html" data-i18n="nav.portfolio">ผลงาน</a>
+        <a href="achievements.html" class="active" data-i18n="nav.certs">เกียรติบัตร</a>
+        <a href="downloads.html" data-i18n="nav.downloads">ดาวน์โหลด</a>
+        <a href="index.html" data-i18n="nav.contact">ติดต่อ</a>
       </div>
+      <button class="lang-toggle" type="button"><span data-l="th">TH</span><span data-l="en">EN</span></button>
     </nav>
 
     <header class="hero">
       <span class="eyebrow glass">Certificates &amp; Activities</span>
-      <h1>เกียรติบัตรและกิจกรรม</h1>
-      <p>รวมใบรับรอง รางวัล และกิจกรรมที่เคยเข้าร่วม</p>
+      <h1 data-i18n="ac.h1">เกียรติบัตรและกิจกรรม</h1>
+      <p data-i18n="ac.sub">รวมใบรับรอง รางวัล และกิจกรรมที่เคยเข้าร่วม</p>
     </header>
 
     <div class="stats">
-      <div class="stat glass"><b id="sCert">0</b><span>เกียรติบัตร</span></div>
-      <div class="stat glass"><b id="sAward">0</b><span>รางวัล</span></div>
-      <div class="stat glass"><b id="sAct">0</b><span>กิจกรรม</span></div>
+      <div class="stat glass"><b id="sCert">0</b><span data-i18n="ac.statCert">เกียรติบัตร</span></div>
+      <div class="stat glass"><b id="sAward">0</b><span data-i18n="ac.statAward">รางวัล</span></div>
+      <div class="stat glass"><b id="sAct">0</b><span data-i18n="ac.statAct">กิจกรรม</span></div>
     </div>
 
     <div class="section-title">
-      <h2>🏅 เกียรติบัตร</h2>
+      <h2 data-i18n="ac.certs">🏅 เกียรติบัตร</h2>
       <div class="filters" id="certFilters"></div>
     </div>
     <section class="certs" id="certs"></section>
 
     <div class="section-title">
-      <h2>📅 กิจกรรม</h2>
+      <h2 data-i18n="ac.acts">📅 กิจกรรม</h2>
     </div>
     <section class="timeline" id="timeline"></section>
 
@@ -338,9 +340,9 @@
 
   <!-- Lightbox ดูรูปขนาดใหญ่ -->
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="ดูรูป">
-    <button class="lb-close glass" id="lbClose" aria-label="ปิด">✕</button>
-    <button class="lb-nav lb-prev glass" id="lbPrev" aria-label="รูปก่อนหน้า">‹</button>
-    <button class="lb-nav lb-next glass" id="lbNext" aria-label="รูปถัดไป">›</button>
+    <button class="lb-close glass" id="lbClose" aria-label="ปิด" data-i18n-aria="ac.close">✕</button>
+    <button class="lb-nav lb-prev glass" id="lbPrev" aria-label="รูปก่อนหน้า" data-i18n-aria="ac.prev">‹</button>
+    <button class="lb-nav lb-next glass" id="lbNext" aria-label="รูปถัดไป" data-i18n-aria="ac.next">›</button>
     <div class="lb-box glass">
       <img class="lb-img" id="lbImg" alt="">
       <div class="lb-info" id="lbInfo"></div>
@@ -352,39 +354,51 @@
     // 🔧 เกียรติบัตร
     //   image  : ลิงก์แชร์รูปจาก Google Drive (ตั้งเป็น "ทุกคนที่มีลิงก์")
     //            หรือชื่อไฟล์ใน repo เช่น "certs/cert1.jpg" (ไม่มีใส่ "")
+    //   date   : ใส่แบบ "ปี ค.ศ.-เดือน-วัน" เช่น "2026-02-26" (ใช้เรียงลำดับ + แสดงเป็น 26 ก.พ. 2569 ให้เอง)
     //   award  : true = เป็นรางวัล (ขึ้นป้ายสีทอง + นับในช่อง "รางวัล")
     //   level  : ข้อความบนป้าย เช่น "ชนะเลิศ", "รองชนะเลิศอันดับ 1" (ไม่มีใส่ "")
     //   verify : ลิงก์ตรวจสอบใบรับรอง หรือลิงก์ไฟล์ PDF (ไม่มีใส่ "")
+    //   🌐 ภาษาอังกฤษ: เพิ่ม title_en, issuer_en, category_en, level_en (ไม่ใส่ = ใช้ภาษาไทย)
     // =====================================================
     const CERTIFICATES = [
       {
-        title: "iOS App Development with Swift and Xcode",
-        issuer: "สำนักวิทยบริการฯ ม.ราชภัฏสวนสุนันทา",
-        date: "26 ก.พ. 2569",
-        category: "อบรม",
-        award: false,
-        level: "ชนะเลิศ",
-        image: "https://drive.google.com/file/d/1VovAen2LEz3mSV_cZXVJpCul0YjBG6xL/view?usp=sharing",
-        verify: ""
-      },
-      {
         title: "PLC ระดับ 1 (30 ชั่วโมง)",
+        title_en: "PLC Level 1 Upskilling Course (30 hours)",
         issuer: "กรมพัฒนาฝีมือแรงงาน กระทรวงแรงงาน",
-        date: "3 ส.ค. 2569",
+        issuer_en: "Department of Skill Development, Ministry of Labour",
+        date: "2026-08-03",
         category: "อบรม",
+        category_en: "Training",
         award: false,
-        level: "",
+        level: "30 ชั่วโมง",
+        level_en: "30 hours",
         image: "https://drive.google.com/file/d/1PrcakAd6Ud5eaSTKfqlse0UD9yrbH-cj/view?usp=sharing",
         verify: ""
       },
       {
-        title: "PLC Control Technician (PLC Level 1)",
-        issuer: "สถาบันนวัตกรรมไทย-ฝรั่งเศส มจพ.",
-        date: "26 มิ.ย. 2569",
+        title: "PLC Control Technician: Programmable Logic Controller (PLC Level 1)",
+        title_en: "PLC Control Technician: Programmable Logic Controller (PLC Level 1)",
+        issuer: "สถาบันนวัตกรรมไทย-ฝรั่งเศส มจพ. (KMUTNB)",
+        issuer_en: "Thai-French Innovation Institute, KMUTNB",
+        date: "2026-06-26",
         category: "อบรม",
+        category_en: "Training",
         award: false,
         level: "",
         image: "https://drive.google.com/file/d/17sTsANaVM4Zo7Jdra9r7Y0lcKfqdpXv-/view?usp=sharing",
+        verify: ""
+      },
+      {
+        title: "iOS App Development with Swift and Xcode",
+        title_en: "iOS App Development with Swift and Xcode",
+        issuer: "สำนักวิทยบริการและเทคโนโลยีสารสนเทศ มหาวิทยาลัยราชภัฏสวนสุนันทา",
+        issuer_en: "Office of Academic Resources and IT, Suan Sunandha Rajabhat University",
+        date: "2026-02-26",
+        category: "อบรม",
+        category_en: "Training",
+        award: false,
+        level: "",
+        image: "https://drive.google.com/file/d/1VovAen2LEz3mSV_cZXVJpCul0YjBG6xL/view?usp=sharing",
         verify: ""
       }
     ];
@@ -395,6 +409,7 @@
     //   folder : วางลิงก์โฟลเดอร์ Google Drive → ดึงรูปทั้งโฟลเดอร์มาให้เอง (ไม่มีใส่ "")
     //            ใช้ images กับ folder พร้อมกันได้
     //   link   : ลิงก์โพสต์ / ข่าว / repo ที่เกี่ยวข้อง (ไม่มีใส่ "")
+    //   🌐 ภาษาอังกฤษ: เพิ่ม title_en, role_en, place_en, desc_en, tags_en (ไม่ใส่ = ใช้ภาษาไทย)
     // =====================================================
     const ACTIVITIES = [
       {
@@ -435,7 +450,12 @@
     document.getElementById("y").textContent = new Date().getFullYear();
 
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    const thDate = d => d ? new Date(d).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" }) : "";
+    // วันที่ต้องเป็นแบบ "ปี-เดือน-วัน" (ค.ศ.) เช่น "2026-02-26" ถ้าพิมพ์แบบอื่นจะแสดงข้อความตามที่พิมพ์ไว้
+    const thDate = d => {
+      if (!d) return "";
+      const dt = new Date(d);
+      return isNaN(dt) ? String(d) : dt.toLocaleDateString(locale(), { day: "numeric", month: "short", year: "numeric" });
+    };
 
     // ลิงก์แชร์ Google Drive → ลิงก์รูปที่แสดงในเว็บได้
     function img(url, size = 1600) {
@@ -457,38 +477,50 @@
     countUp(document.getElementById("sAward"), CERTIFICATES.filter(c => c.award).length);
     countUp(document.getElementById("sAct"), ACTIVITIES.length);
 
+    const ALL = "__all";
+
     // ---------- เกียรติบัตร ----------
     const certsEl = document.getElementById("certs");
     const filtersEl = document.getElementById("certFilters");
     const sortedCerts = [...CERTIFICATES].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-    const cats = ["ทั้งหมด", ...new Set(sortedCerts.map(c => c.category).filter(Boolean))];
+    let currentCat = ALL;
 
-    filtersEl.innerHTML = cats.map((c, i) =>
-      `<button class="chip glass${i === 0 ? " active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+    function renderCertFilters() {
+      const cats = [...new Set(sortedCerts.map(c => c.category).filter(Boolean))];
+      filtersEl.innerHTML = [ALL, ...cats].map(c => {
+        const label = c === ALL ? t("all") : pick(sortedCerts.find(x => x.category === c), "category");
+        return `<button class="chip glass${c === currentCat ? " active" : ""}" data-cat="${esc(c)}">${esc(label)}</button>`;
+      }).join("");
+    }
     filtersEl.addEventListener("click", e => {
       const b = e.target.closest(".chip");
       if (!b) return;
-      filtersEl.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === b));
-      renderCerts(b.dataset.cat);
+      currentCat = b.dataset.cat;
+      renderCertFilters();
+      renderCerts();
     });
 
-    function renderCerts(cat) {
-      const list = cat === "ทั้งหมด" ? sortedCerts : sortedCerts.filter(c => c.category === cat);
-      if (!list.length) { certsEl.innerHTML = `<p class="empty">ยังไม่มีเกียรติบัตร</p>`; return; }
-      certsEl.innerHTML = list.map((c, i) => `
+    function renderCerts() {
+      const list = currentCat === ALL ? sortedCerts : sortedCerts.filter(c => c.category === currentCat);
+      if (!list.length) { certsEl.innerHTML = `<p class="empty">${t("ac.noCerts")}</p>`; return; }
+      certsEl.innerHTML = list.map((c, i) => {
+        const title = pick(c, "title"), level = pick(c, "level"), cat = pick(c, "category");
+        return `
         <button class="cert glass" data-i="${sortedCerts.indexOf(c)}" style="animation-delay:${i * 60}ms">
           <div class="thumb">
-            ${c.image ? `<img src="${esc(img(c.image, 800))}" alt="${esc(c.title)}" loading="lazy">` : `<span class="ph">${c.award ? "🏆" : "📜"}</span>`}
-            ${c.level ? `<span class="badge${c.award ? " award" : ""}">${c.award ? "🏆 " : ""}${esc(c.level)}</span>` : ""}
+            ${c.image ? `<img src="${esc(img(c.image, 800))}" alt="${esc(title)}" loading="lazy">` : `<span class="ph">${c.award ? "🏆" : "📜"}</span>`}
+            ${level ? `<span class="badge${c.award ? " award" : ""}">${c.award ? "🏆 " : ""}${esc(level)}</span>` : ""}
           </div>
           <div class="body">
-            <h3>${esc(c.title)}</h3>
-            <p class="issuer">${esc(c.issuer)}</p>
-            <p class="date">${thDate(c.date)}${c.category ? " · " + esc(c.category) : ""}</p>
+            <h3>${esc(title)}</h3>
+            <p class="issuer">${esc(pick(c, "issuer"))}</p>
+            <p class="date">${thDate(c.date)}${cat ? " · " + esc(cat) : ""}</p>
           </div>
-        </button>`).join("");
+        </button>`;
+      }).join("");
     }
-    renderCerts("ทั้งหมด");
+    renderCertFilters();
+    renderCerts();
 
     certsEl.addEventListener("click", e => {
       const b = e.target.closest(".cert");
@@ -496,14 +528,15 @@
       const c = sortedCerts[+b.dataset.i];
       if (!c.image) { if (c.verify) window.open(c.verify, "_blank", "noopener"); return; }
       openLB([img(c.image)], 0, `
-        <div><h3>${esc(c.title)}</h3><p>${esc(c.issuer)} · ${thDate(c.date)}</p></div>
-        ${c.verify ? `<a class="btn" href="${esc(c.verify)}" target="_blank" rel="noopener">ตรวจสอบใบรับรอง ↗</a>` : ""}`);
+        <div><h3>${esc(pick(c, "title"))}</h3><p>${esc(pick(c, "issuer"))} · ${thDate(c.date)}</p></div>
+        ${c.verify ? `<a class="btn" href="${esc(c.verify)}" target="_blank" rel="noopener">${t("ac.verify")}</a>` : ""}`);
     });
 
     // ---------- กิจกรรม ----------
     const tlEl = document.getElementById("timeline");
     const sortedActs = [...ACTIVITIES].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
     const actPhotos = sortedActs.map(() => []); // รูปทั้งหมดของแต่ละกิจกรรม (ใช้ตอนกดดูเต็มจอ)
+    const folderCache = {};                      // จำรายการรูปในโฟลเดอร์ไว้ ไม่ต้องโหลดซ้ำตอนเปลี่ยนภาษา
 
     const folderId = url => ((url || "").match(/\/folders\/([\w-]+)/) || (url || "").match(/[?&]id=([\w-]+)/) || [])[1];
 
@@ -528,61 +561,75 @@
       const extra = photos.length - shown.length;
       return `<div class="gallery">${shown.map((src, j) => {
         const isLast = extra > 0 && j === shown.length - 1;
-        return `<button data-a="${i}" data-j="${j}" aria-label="ดูรูปที่ ${j + 1}"${isLast ? ` class="more-tile" data-more="+${extra + 1}"` : ""}>
+        return `<button data-a="${i}" data-j="${j}" aria-label="${t("ac.viewPhoto", { n: j + 1 })}"${isLast ? ` class="more-tile" data-more="+${extra + 1}"` : ""}>
           <img src="${esc(src.replace(/sz=w\d+/, "sz=w400"))}" alt="" loading="lazy"></button>`;
       }).join("")}</div>
-      ${photos.length > 1 ? `<p class="gallery-note">${photos.length} รูป · กดเพื่อดูเต็มจอ</p>` : ""}`;
+      ${photos.length > 1 ? `<p class="gallery-note">${t("ac.photos", { n: photos.length })}</p>` : ""}`;
     }
 
     async function loadGallery(a, i) {
       const box = document.getElementById(`g${i}`);
-      const photos = (a.images || []).filter(Boolean).map(src => img(src));
+      const own = (a.images || []).filter(Boolean).map(src => img(src));
       const fid = folderId(a.folder);
+      let folderPhotos = [];
 
       if (fid && DRIVE_API_KEY) {
-        box.innerHTML = `<div class="gallery">${'<div class="skeleton"></div>'.repeat(4)}</div>`;
-        try { photos.push(...await listFolderImages(fid)); }
-        catch (e) { console.warn("โหลดโฟลเดอร์ไม่ได้", e); }
+        if (!(fid in folderCache)) {
+          box.innerHTML = `<div class="gallery">${'<div class="skeleton"></div>'.repeat(4)}</div>`;
+          folderCache[fid] = listFolderImages(fid).catch(e => { console.warn("โหลดโฟลเดอร์ไม่ได้", e); return []; });
+        }
+        folderPhotos = await folderCache[fid];
       }
 
+      const photos = [...own, ...folderPhotos];
       actPhotos[i] = photos;
       let html = galleryHTML(i, photos);
 
       // ไม่มี API key (หรือโหลดไม่ได้) → ฝังโฟลเดอร์ของ Google แทน
-      if (fid && (!DRIVE_API_KEY || photos.length === (a.images || []).filter(Boolean).length)) {
-        html += `<div class="folder-embed"><iframe src="https://drive.google.com/embeddedfolderview?id=${fid}#grid" loading="lazy" title="รูปกิจกรรม"></iframe></div>`;
+      if (fid && (!DRIVE_API_KEY || !folderPhotos.length)) {
+        html += `<div class="folder-embed"><iframe src="https://drive.google.com/embeddedfolderview?id=${fid}#grid" loading="lazy" title="${esc(pick(a, "title"))}"></iframe></div>`;
       }
       if (fid) {
-        html += `<a class="more" href="https://drive.google.com/drive/folders/${fid}" target="_blank" rel="noopener">📁 เปิดโฟลเดอร์รูปทั้งหมด ↗</a>`;
+        html += `<a class="more" href="https://drive.google.com/drive/folders/${fid}" target="_blank" rel="noopener">${t("ac.openFolder")}</a>`;
       }
       box.innerHTML = html;
     }
 
-    tlEl.innerHTML = sortedActs.length ? sortedActs.map((a, i) => `
+    function renderActs() {
+      tlEl.innerHTML = sortedActs.length ? sortedActs.map((a, i) => {
+        const role = pick(a, "role"), place = pick(a, "place"), desc = pick(a, "desc"), tags = pick(a, "tags") || [];
+        return `
       <article class="act" style="animation-delay:${i * 80}ms">
         <div class="act-card glass">
           <div class="act-head">
             <div>
-              <h3>${esc(a.title)}</h3>
-              ${a.role ? `<p class="role">${esc(a.role)}</p>` : ""}
+              <h3>${esc(pick(a, "title"))}</h3>
+              ${role ? `<p class="role">${esc(role)}</p>` : ""}
             </div>
-            <span class="when">${thDate(a.date)}${a.place ? " · " + esc(a.place) : ""}</span>
+            <span class="when">${thDate(a.date)}${place ? " · " + esc(place) : ""}</span>
           </div>
-          ${a.desc ? `<p>${esc(a.desc)}</p>` : ""}
-          ${a.tags && a.tags.length ? `<div class="tags">${a.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
+          ${desc ? `<p>${esc(desc)}</p>` : ""}
+          ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${esc(tag)}</span>`).join("")}</div>` : ""}
           <div id="g${i}"></div>
-          ${a.link ? `<a class="more" href="${esc(a.link)}" target="_blank" rel="noopener">ดูรายละเอียด ↗</a>` : ""}
+          ${a.link ? `<a class="more" href="${esc(a.link)}" target="_blank" rel="noopener">${t("ac.details")}</a>` : ""}
         </div>
-      </article>`).join("") : `<p class="empty">ยังไม่มีกิจกรรม</p>`;
-    sortedActs.forEach(loadGallery);
+      </article>`;
+      }).join("") : `<p class="empty">${t("ac.noActs")}</p>`;
+      sortedActs.forEach(loadGallery);
+    }
+    renderActs();
 
     tlEl.addEventListener("click", e => {
       const b = e.target.closest(".gallery button");
       if (!b) return;
       const i = +b.dataset.a;
       const a = sortedActs[i];
-      openLB(actPhotos[i], +b.dataset.j, `<div><h3>${esc(a.title)}</h3><p>${thDate(a.date)}${a.place ? " · " + esc(a.place) : ""}</p></div>`);
+      const place = pick(a, "place");
+      openLB(actPhotos[i], +b.dataset.j, `<div><h3>${esc(pick(a, "title"))}</h3><p>${thDate(a.date)}${place ? " · " + esc(place) : ""}</p></div>`);
     });
+
+    // เปลี่ยนภาษา → วาดใหม่
+    document.addEventListener("langchange", () => { renderCertFilters(); renderCerts(); renderActs(); });
 
     // ---------- Lightbox (เลื่อนดูทีละรูปได้) ----------
     const lb = document.getElementById("lb");

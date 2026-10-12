@@ -189,8 +189,9 @@
       *, *::before { animation: none !important; transition: none !important; }
     }
   </style>
+  <script src="lang.js"></script>
 </head>
-<body>
+<body data-title="dl.title">
   <canvas id="bg" aria-hidden="true"></canvas>
   <div class="blobs" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
   <div class="grain" aria-hidden="true"></div>
@@ -202,28 +203,29 @@
         <span>Rapeepat Dev</span>
       </a>
       <div class="nav-links">
-        <a href="portfolio.html">ผลงาน</a>
-        <a href="achievements.html">เกียรติบัตร</a>
-        <a href="downloads.html" class="active">ดาวน์โหลด</a>
-        <a href="index.html">ติดต่อ</a>
+        <a href="portfolio.html" data-i18n="nav.portfolio">ผลงาน</a>
+        <a href="achievements.html" data-i18n="nav.certs">เกียรติบัตร</a>
+        <a href="downloads.html" class="active" data-i18n="nav.downloads">ดาวน์โหลด</a>
+        <a href="index.html" data-i18n="nav.contact">ติดต่อ</a>
       </div>
+      <button class="lang-toggle" type="button"><span data-l="th">TH</span><span data-l="en">EN</span></button>
     </nav>
 
     <header class="hero">
       <span class="eyebrow glass">Downloads</span>
-      <h1>ดาวน์โหลด</h1>
-      <p>รวมไฟล์ เอกสาร และโปรแกรมต่าง ๆ กดดาวน์โหลดได้เลย</p>
+      <h1 data-i18n="dl.title">ดาวน์โหลด</h1>
+      <p data-i18n="dl.sub">รวมไฟล์ เอกสาร และโปรแกรมต่าง ๆ กดดาวน์โหลดได้เลย</p>
     </header>
 
     <label class="search glass">
       <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.32 12.9l5.39 5.4-1.41 1.41-5.4-5.39A8 8 0 1 1 10 2Zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/></svg>
-      <input id="q" type="search" placeholder="ค้นหาไฟล์…" autocomplete="off">
+      <input id="q" type="search" placeholder="ค้นหาไฟล์…" data-i18n-ph="dl.search" autocomplete="off">
     </label>
     <div class="filters" id="filters"></div>
 
     <section class="list" id="list"></section>
 
-    <p class="tip glass">💡 ไฟล์ทั้งหมดเก็บอยู่บน Google Drive ถ้าไฟล์ใหญ่ Google จะถามยืนยันก่อนดาวน์โหลด ให้กด "ดาวน์โหลดต่อ" ได้เลย</p>
+    <p class="tip glass" data-i18n="dl.tip">💡 ไฟล์ทั้งหมดเก็บอยู่บน Google Drive ถ้าไฟล์ใหญ่ Google จะถามยืนยันก่อนดาวน์โหลด ให้กด "ดาวน์โหลดต่อ" ได้เลย</p>
 
     <footer>© <span id="y"></span> Rapeepat Dev</footer>
   </div>
@@ -237,12 +239,14 @@
     //          https://drive.google.com/drive/folders/xxxxxxxx
     //   type : PDF, ZIP, EXE, DMG, APK, DOC, XLS, PPT, IMG, VIDEO, FOLDER ... (ใช้ทำไอคอน)
     //   size / date : ใส่หรือไม่ใส่ก็ได้
+    //   🌐 ภาษาอังกฤษ: เพิ่ม name_en, desc_en, category_en (ไม่ใส่ = ใช้ภาษาไทย)
     // =====================================================
     const FILES = [
       {
         name: "AI_Detection_Lab_Setup v6.exe",
         desc: "For Window Version",
         category: "โปรแกรม",
+        category_en: "Software",
         type: "EXE",
         size: "273 MB",
         date: "2026-10-11",
@@ -252,6 +256,7 @@
         name: "AI_Detection_Lab_v6.dmg",
         desc: "For MacOS Chip M Silicon",
         category: "โปรแกรม",
+        category_en: "Software",
         type: "DMG",
         size: "255.2 MB",
         date: "2026-10-11",
@@ -261,6 +266,7 @@
         name: "AI Detection Lab v6.0.0 Intel.dmg",
         desc: "For MacOS Chip Intel",
         category: "โปรแกรม",
+        category_en: "Software",
         type: "DMG",
         size: "353.1 MB",
         date: "2026-10-11",
@@ -300,16 +306,21 @@
     const listEl = document.getElementById("list");
     const filtersEl = document.getElementById("filters");
     const qEl = document.getElementById("q");
-    let currentCat = "ทั้งหมด";
+    const ALL = "__all";
+    let currentCat = ALL;
 
-    const cats = ["ทั้งหมด", ...new Set(FILES.map(f => f.category).filter(Boolean))];
-    filtersEl.innerHTML = cats.map((c, i) =>
-      `<button class="chip glass${i === 0 ? " active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+    function renderFilters() {
+      const cats = [...new Set(FILES.map(f => f.category).filter(Boolean))];
+      filtersEl.innerHTML = [ALL, ...cats].map(c => {
+        const label = c === ALL ? t("all") : pick(FILES.find(f => f.category === c), "category");
+        return `<button class="chip glass${c === currentCat ? " active" : ""}" data-cat="${esc(c)}">${esc(label)}</button>`;
+      }).join("");
+    }
     filtersEl.addEventListener("click", e => {
       const b = e.target.closest(".chip");
       if (!b) return;
       currentCat = b.dataset.cat;
-      filtersEl.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === b));
+      renderFilters();
       render();
     });
     qEl.addEventListener("input", render);
@@ -317,38 +328,43 @@
     function render() {
       const q = qEl.value.trim().toLowerCase();
       const list = FILES.filter(f =>
-        (currentCat === "ทั้งหมด" || f.category === currentCat) &&
-        (!q || `${f.name} ${f.desc} ${f.type}`.toLowerCase().includes(q)));
+        (currentCat === ALL || f.category === currentCat) &&
+        (!q || [f.name, f.name_en, f.desc, f.desc_en, f.type].join(" ").toLowerCase().includes(q)));
 
-      if (!list.length) { listEl.innerHTML = `<p class="empty">ไม่พบไฟล์ที่ค้นหา</p>`; return; }
+      if (!list.length) { listEl.innerHTML = `<p class="empty">${t("dl.empty")}</p>`; return; }
 
       listEl.innerHTML = list.map((f, i) => {
         const L = driveLinks(f.link);
         const type = (f.type || (L.isFolder ? "FOLDER" : "FILE")).toUpperCase();
         const c = typeColors[type] || "#a5b4ff";
-        const date = f.date ? new Date(f.date).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" }) : "";
+        const name = pick(f, "name"), desc = pick(f, "desc"), cat = pick(f, "category");
+        const date = f.date ? new Date(f.date).toLocaleDateString(locale(), { day: "numeric", month: "short", year: "numeric" }) : "";
         return `
           <article class="file glass" style="animation-delay:${i * 60}ms">
             <div class="ficon" style="color:${c};background:${c}22">${type === "FOLDER" ? icons.folder.replace("<svg", `<svg width="24" height="24" fill="${c}"`) : esc(type.slice(0, 4))}</div>
             <div class="finfo">
-              <h3 title="${esc(f.name)}">${esc(f.name)}</h3>
-              ${f.desc ? `<p>${esc(f.desc)}</p>` : ""}
+              <h3 title="${esc(name)}">${esc(name)}</h3>
+              ${desc ? `<p>${esc(desc)}</p>` : ""}
               <div class="fmeta">
                 ${f.size ? `<span>${esc(f.size)}</span>` : ""}
                 ${date ? `<span>${date}</span>` : ""}
-                ${f.category ? `<span>${esc(f.category)}</span>` : ""}
+                ${cat ? `<span>${esc(cat)}</span>` : ""}
               </div>
             </div>
             <div class="factions">
               ${L.isFolder
-                ? `<a class="btn primary" href="${esc(L.view)}" target="_blank" rel="noopener">${icons.folder}เปิดโฟลเดอร์</a>`
-                : `<a class="btn" href="${esc(L.view)}" target="_blank" rel="noopener">${icons.view}ดู</a>
-                   <a class="btn primary" href="${esc(L.download)}" target="_blank" rel="noopener">${icons.download}ดาวน์โหลด</a>`}
+                ? `<a class="btn primary" href="${esc(L.view)}" target="_blank" rel="noopener">${icons.folder}${t("dl.openFolder")}</a>`
+                : `<a class="btn" href="${esc(L.view)}" target="_blank" rel="noopener">${icons.view}${t("dl.view")}</a>
+                   <a class="btn primary" href="${esc(L.download)}" target="_blank" rel="noopener">${icons.download}${t("dl.download")}</a>`}
             </div>
           </article>`;
       }).join("");
     }
+    renderFilters();
     render();
+
+    // เปลี่ยนภาษา → วาดใหม่
+    document.addEventListener("langchange", () => { renderFilters(); render(); });
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

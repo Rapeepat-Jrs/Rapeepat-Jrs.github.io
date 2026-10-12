@@ -222,8 +222,9 @@
       *, *::before { animation: none !important; transition: none !important; }
     }
   </style>
+  <script src="lang.js"></script>
 </head>
-<body>
+<body data-title="pf.title">
   <canvas id="bg" aria-hidden="true"></canvas>
   <div class="blobs" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
   <div class="grain" aria-hidden="true"></div>
@@ -235,32 +236,33 @@
         <span>Rapeepat Dev</span>
       </a>
       <div class="nav-links">
-        <a href="portfolio.html" class="active">ผลงาน</a>
-        <a href="achievements.html">เกียรติบัตร</a>
-        <a href="downloads.html">ดาวน์โหลด</a>
-        <a href="index.html">ติดต่อ</a>
+        <a href="portfolio.html" class="active" data-i18n="nav.portfolio">ผลงาน</a>
+        <a href="achievements.html" data-i18n="nav.certs">เกียรติบัตร</a>
+        <a href="downloads.html" data-i18n="nav.downloads">ดาวน์โหลด</a>
+        <a href="index.html" data-i18n="nav.contact">ติดต่อ</a>
       </div>
+      <button class="lang-toggle" type="button"><span data-l="th">TH</span><span data-l="en">EN</span></button>
     </nav>
 
     <header class="hero">
       <span class="eyebrow glass">Portfolio</span>
-      <h1>ผลงานที่ผมสร้าง</h1>
-      <p>รวมโปรเจกต์ที่ทำมา ทั้งเว็บ แอป และงานทดลองเล็ก ๆ น้อย ๆ</p>
+      <h1 data-i18n="pf.h1">ผลงานที่ผมสร้าง</h1>
+      <p data-i18n="pf.sub">รวมโปรเจกต์ที่ทำมา ทั้งเว็บ แอป และงานทดลองเล็ก ๆ น้อย ๆ</p>
     </header>
 
     <div class="filters" id="filters"></div>
     <section class="grid" id="projects"></section>
 
     <div class="section-title">
-      <h2>Repositories ล่าสุด</h2>
-      <a href="https://github.com/Rapeepat-Jrs?tab=repositories" target="_blank" rel="noopener">ดูทั้งหมดบน GitHub →</a>
+      <h2 data-i18n="pf.repos">Repositories ล่าสุด</h2>
+      <a href="https://github.com/Rapeepat-Jrs?tab=repositories" target="_blank" rel="noopener" data-i18n="pf.seeAll">ดูทั้งหมดบน GitHub →</a>
     </div>
     <section class="repos" id="repos"><p class="note">กำลังโหลด…</p></section>
 
     <section class="cta glass">
-      <h2>อยากร่วมงานกัน?</h2>
-      <p>ทักมาพูดคุยได้เลยครับ</p>
-      <a class="btn primary" href="index.html">ช่องทางติดต่อ →</a>
+      <h2 data-i18n="pf.ctaH">อยากร่วมงานกัน?</h2>
+      <p data-i18n="pf.ctaP">ทักมาพูดคุยได้เลยครับ</p>
+      <a class="btn primary" href="index.html" data-i18n="pf.ctaBtn">ช่องทางติดต่อ →</a>
     </section>
 
     <footer>© <span id="y"></span> Rapeepat Dev</footer>
@@ -272,11 +274,13 @@
     //   image : ลิงก์รูป หรือชื่อไฟล์ใน repo เช่น "images/shop.png" (ไม่มีก็ใส่ "")
     //   emoji : ใช้แทนรูป ถ้าไม่มี image
     //   demo  : ลิงก์ดูเว็บจริง  /  code : ลิงก์ซอร์สโค้ด (ไม่มีใส่ "")
+    //   🌐 ภาษาอังกฤษ: เพิ่ม title_en, desc_en, category_en, tags_en (ไม่ใส่ = ใช้ภาษาไทย)
     // =====================================================
     const PROJECTS = [
       {
         title: "Contact Link Page",
         desc: "หน้ารวมช่องทางติดต่อ ธีมมืด สไตล์ liquid glass พื้นหลังของเหลวด้วย Three.js",
+        desc_en: "A dark-themed link-in-bio page in liquid glass style, with a Three.js fluid background.",
         category: "Web",
         tags: ["HTML", "CSS", "Three.js"],
         image: "",
@@ -319,62 +323,79 @@
     ];
 
     // ---------- ตัวกรอง + การ์ด ----------
-    const cats = ["ทั้งหมด", ...new Set(PROJECTS.map(p => p.category))];
     const filtersEl = document.getElementById("filters");
     const gridEl = document.getElementById("projects");
+    const ALL = "__all";
+    let currentCat = ALL;
 
-    function renderProjects(cat) {
-      const list = cat === "ทั้งหมด" ? PROJECTS : PROJECTS.filter(p => p.category === cat);
+    function renderFilters() {
+      const cats = [...new Set(PROJECTS.map(p => p.category).filter(Boolean))];
+      filtersEl.innerHTML = [ALL, ...cats].map(c => {
+        const label = c === ALL ? t("all") : pick(PROJECTS.find(p => p.category === c), "category");
+        return `<button class="chip glass${c === currentCat ? " active" : ""}" data-cat="${esc(c)}">${esc(label)}</button>`;
+      }).join("");
+    }
+
+    function renderProjects() {
+      const list = currentCat === ALL ? PROJECTS : PROJECTS.filter(p => p.category === currentCat);
       gridEl.innerHTML = list.map((p, i) => `
         <article class="project glass" style="animation-delay:${i * 70}ms">
           <div class="thumb">
             ${p.image
-              ? `<img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">`
+              ? `<img src="${esc(p.image)}" alt="${esc(pick(p, "title"))}" loading="lazy">`
               : `<div class="ph" style="background:${gradients[i % gradients.length]}">${esc(p.emoji || "✨")}</div>`}
           </div>
           <div class="body">
-            <h3>${esc(p.title)}</h3>
-            <p>${esc(p.desc)}</p>
-            <div class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+            <h3>${esc(pick(p, "title"))}</h3>
+            <p>${esc(pick(p, "desc"))}</p>
+            <div class="tags">${(pick(p, "tags") || []).map(tag => `<span class="tag">${esc(tag)}</span>`).join("")}</div>
             ${(p.demo || p.code) ? `<div class="actions">
-              ${p.demo ? `<a class="btn primary" href="${esc(p.demo)}" target="_blank" rel="noopener">ดูผลงาน</a>` : ""}
-              ${p.code ? `<a class="btn" href="${esc(p.code)}" target="_blank" rel="noopener">โค้ด</a>` : ""}
+              ${p.demo ? `<a class="btn primary" href="${esc(p.demo)}" target="_blank" rel="noopener">${t("pf.demo")}</a>` : ""}
+              ${p.code ? `<a class="btn" href="${esc(p.code)}" target="_blank" rel="noopener">${t("pf.code")}</a>` : ""}
             </div>` : ""}
           </div>
         </article>`).join("");
     }
 
-    filtersEl.innerHTML = cats.map((c, i) =>
-      `<button class="chip glass${i === 0 ? " active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
     filtersEl.addEventListener("click", e => {
       const b = e.target.closest(".chip");
       if (!b) return;
-      filtersEl.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === b));
-      renderProjects(b.dataset.cat);
+      currentCat = b.dataset.cat;
+      renderFilters();
+      renderProjects();
     });
-    renderProjects("ทั้งหมด");
+    renderFilters();
+    renderProjects();
 
     // ---------- ดึง repo จาก GitHub อัตโนมัติ ----------
     const langColors = { JavaScript: "#f1e05a", TypeScript: "#3178c6", HTML: "#e34c26", CSS: "#663399", Python: "#3572A5", Java: "#b07219", Swift: "#F05138", Kotlin: "#A97BFF", Dart: "#00B4AB", "C++": "#f34b7d", C: "#555555", PHP: "#4F5D95", Go: "#00ADD8", Vue: "#41b883" };
     const reposEl = document.getElementById("repos");
+    let repoData = null, repoFailed = false;
+
+    function renderRepos() {
+      if (repoFailed) { reposEl.innerHTML = `<p class="note">${t("pf.repoErr")}</p>`; return; }
+      if (!repoData) { reposEl.innerHTML = `<p class="note">${t("loading")}</p>`; return; }
+      if (!repoData.length) { reposEl.innerHTML = `<p class="note">${t("pf.noRepos")}</p>`; return; }
+      reposEl.innerHTML = repoData.map(r => `
+        <a class="repo glass" href="${esc(r.html_url)}" target="_blank" rel="noopener">
+          <h4>${esc(r.name)}</h4>
+          <p>${esc(r.description || t("pf.noDesc"))}</p>
+          <div class="meta">
+            ${r.language ? `<span><span class="dot" style="background:${langColors[r.language] || "#8b949e"}"></span>${esc(r.language)}</span>` : ""}
+            <span>★ ${r.stargazers_count}</span>
+            <span>${new Date(r.updated_at).toLocaleDateString(locale(), { day: "numeric", month: "short", year: "numeric" })}</span>
+          </div>
+        </a>`).join("");
+    }
+    renderRepos();
 
     fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=12`)
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then(repos => {
-        repos = repos.filter(r => !r.fork).slice(0, 6);
-        if (!repos.length) { reposEl.innerHTML = `<p class="note">ยังไม่มี repository สาธารณะ</p>`; return; }
-        reposEl.innerHTML = repos.map(r => `
-          <a class="repo glass" href="${esc(r.html_url)}" target="_blank" rel="noopener">
-            <h4>${esc(r.name)}</h4>
-            <p>${esc(r.description || "ไม่มีคำอธิบาย")}</p>
-            <div class="meta">
-              ${r.language ? `<span><span class="dot" style="background:${langColors[r.language] || "#8b949e"}"></span>${esc(r.language)}</span>` : ""}
-              <span>★ ${r.stargazers_count}</span>
-              <span>${new Date(r.updated_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}</span>
-            </div>
-          </a>`).join("");
-      })
-      .catch(() => { reposEl.innerHTML = `<p class="note">โหลด repository ไม่ได้ ลองรีเฟรชอีกครั้ง</p>`; });
+      .then(repos => { repoData = repos.filter(r => !r.fork).slice(0, 6); renderRepos(); })
+      .catch(() => { repoFailed = true; renderRepos(); });
+
+    // เปลี่ยนภาษา → วาดใหม่
+    document.addEventListener("langchange", () => { renderFilters(); renderProjects(); renderRepos(); });
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
